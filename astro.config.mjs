@@ -6,7 +6,7 @@ import rehypeKatex from 'rehype-katex';
 
 // TODO: replace with your real domain. Used for canonical URLs, sitemap and RSS.
 export default defineConfig({
-  site: 'https://yourdomain.com',
+  site: 'https://ghidoni.github.io',
   integrations: [sitemap()],
   markdown: {
     // Astro 7 defaults to the Sätteri processor; KaTeX needs the unified pipeline.
