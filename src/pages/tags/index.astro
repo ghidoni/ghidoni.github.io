@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { slugifyTag, tagCounts } from '../../lib/utils';
+
+const [posts, notes] = await Promise.all([
+  getCollection('writing', ({ data }) => !data.draft),
+  getCollection('notes', ({ data }) => !data.draft),
+]);
+
+const counts = tagCounts([...posts, ...notes]);
+---
+
+<Base title="Tags" description="All tags used across writing and notes.">
+  <header class="page-head">
+    <h1>Tags</h1>
+    <p>Everything on the site, grouped by topic.</p>
+  </header>
+
+  <ul class="tag-index">
+    {
+      [...counts.entries()].map(([tag, count]) => (
+        <li>
+          <a class="tag" href={`/tags/${slugifyTag(tag)}/`}>
+            {tag} <span class="dim">{count}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>

@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Search" description="Search across writing and notes.">
+  <header class="page-head">
+    <h1>Search</h1>
+    <p>Full-text search across writing and notes, indexed at build time.</p>
+  </header>
+
+  <div id="search" class="search-shell"></div>
+  <p class="search-note" id="search-note">Loading index…</p>
+</Base>
+
+<script>
+  const note = document.getElementById('search-note');
+
+  const fail = () => {
+    if (note) {
+      note.textContent =
+        'The search index is generated during `npm run build`, so it does not exist in dev mode. Run `npm run build && npm run preview` to try it.';
+    }
+  };
+
+  const script = document.createElement('script');
+  script.src = '/pagefind/pagefind-ui.js';
+  script.onload = () => {
+    // @ts-expect-error — Pagefind attaches itself to window at runtime.
+    if (typeof window.PagefindUI !== 'function') return fail();
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/pagefind/pagefind-ui.css';
+    document.head.appendChild(link);
+
+    // @ts-expect-error — see above.
+    new window.PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+      resetStyles: false,
+    });
+    note?.remove();
+  };
+  script.onerror = fail;
+  document.head.appendChild(script);
+</script>

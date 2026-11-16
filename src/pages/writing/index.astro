@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import Entry from '../../components/Entry.astro';
+import { getCollection } from 'astro:content';
+import { byDateDesc, formatDate } from '../../lib/utils';
+
+const posts = (await getCollection('writing', ({ data }) => !data.draft)).sort(byDateDesc);
+
+// Group by year, newest first.
+const years = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.date.getUTCFullYear();
+  years.set(year, [...(years.get(year) ?? []), post]);
+}
+---
+
+<Base title="Writing" description="Dated posts, project logs and essays.">
+  <header class="page-head">
+    <h1>Writing</h1>
+    <p>Project logs and essays, newest first. For evergreen reference pages, see <a href="/notes/">notes</a>.</p>
+    <div class="meta"><span>{posts.length} posts</span><a href="/rss.xml">rss</a></div>
+  </header>
+
+  {
+    [...years.entries()].map(([year, group]) => (
+      <section class="section">
+        <div class="section-head">
+          <span>{year}</span>
+        </div>
+        <ul class="entry-list">
+          {group.map((post) => (
+            <Entry
+              href={`/writing/${post.id}/`}
+              label={formatDate(post.data.date)}
+              datetime={post.data.date.toISOString()}
+              title={post.data.title}
+              summary={post.data.summary}
+            />
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+
+  {posts.length === 0 && <p class="empty">Nothing published yet.</p>}
+</Base>

@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import Entry from '../../components/Entry.astro';
+import { getCollection } from 'astro:content';
+import { byOrder, slugifyTag, tagCounts } from '../../lib/utils';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(byOrder);
+const tags = [...tagCounts(notes).entries()];
+---
+
+<Base title="Notes" description="An evergreen library of concepts, techniques and references.">
+  <header class="page-head">
+    <h1>Library</h1>
+    <p>
+      Evergreen reference pages: one page per concept, revised over time rather than dated. For
+      chronological project logs, see <a href="/writing/">writing</a>.
+    </p>
+    <div class="meta"><span>{notes.length} pages</span><span>{tags.length} tags</span></div>
+  </header>
+
+  {
+    tags.length > 0 && (
+      <div class="tags">
+        {tags.map(([tag, count]) => (
+          <a class="tag" href={`/tags/${slugifyTag(tag)}/`}>
+            {tag} <span class="dim">{count}</span>
+          </a>
+        ))}
+      </div>
+    )
+  }
+
+  <section class="section">
+    <div class="section-head">
+      <span>all pages</span>
+      <span>a → z by topic</span>
+    </div>
+    <ul class="entry-list">
+      {
+        notes.map((note) => (
+          <Entry
+            href={`/notes/${note.id}/`}
+            label={note.data.tags.slice(0, 2).join(', ') || 'note'}
+            title={note.data.title}
+            summary={note.data.summary}
+          />
+        ))
+      }
+    </ul>
+    {notes.length === 0 && <p class="empty">No notes yet.</p>}
+  </section>
+</Base>

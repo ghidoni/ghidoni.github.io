@@ -1,0 +1,110 @@
+---
+import Base from '../layouts/Base.astro';
+import Entry from '../components/Entry.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '../consts';
+import { byDateDesc, byOrder, formatDate } from '../lib/utils';
+
+const posts = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort(byDateDesc)
+  .slice(0, 5);
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft))
+  .sort(byOrder)
+  .slice(0, 6);
+---
+
+<Base>
+  <section class="hero">
+    <h1>
+      Hi, I am {SITE.author}<br />
+      <span class="dim">and this is my website.</span>
+    </h1>
+    <p class="lede">{SITE.description}</p>
+    <p class="now">{SITE.now}</p>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span>~/writing</span>
+      <a href="/writing/">all →</a>
+    </div>
+    {
+      posts.length ? (
+        <ul class="entry-list">
+          {posts.map((post) => (
+            <Entry
+              href={`/writing/${post.id}/`}
+              label={formatDate(post.data.date)}
+              datetime={post.data.date.toISOString()}
+              title={post.data.title}
+              summary={post.data.summary}
+            />
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">No posts yet.</p>
+      )
+    }
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span>~/notes</span>
+      <a href="/notes/">library →</a>
+    </div>
+    {
+      notes.length ? (
+        <ul class="entry-list">
+          {notes.map((note) => (
+            <Entry
+              href={`/notes/${note.id}/`}
+              label={note.data.tags[0] ?? 'note'}
+              title={note.data.title}
+              summary={note.data.summary}
+            />
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">No notes yet.</p>
+      )
+    }
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span>~/socials</span></div>
+    <nav class="socials" aria-label="Elsewhere">
+      {
+        SITE.socials.map((social) => (
+          <a href={social.href} rel="me noopener">
+            {social.label}
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+</Base>
+
+<style>
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .socials a {
+    color: var(--text-mid);
+    text-decoration: none;
+  }
+
+  .socials a::before {
+    content: '* ';
+    color: var(--text-low);
+  }
+
+  .socials a:hover {
+    color: var(--accent);
+  }
+</style>

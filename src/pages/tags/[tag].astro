@@ -1,0 +1,89 @@
+---
+import Base from '../../layouts/Base.astro';
+import Entry from '../../components/Entry.astro';
+import { getCollection } from 'astro:content';
+import { byDateDesc, byOrder, formatDate, slugifyTag } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const [posts, notes] = await Promise.all([
+    getCollection('writing', ({ data }) => !data.draft),
+    getCollection('notes', ({ data }) => !data.draft),
+  ]);
+
+  const bySlug = new Map<string, { label: string; posts: typeof posts; notes: typeof notes }>();
+
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      const slug = slugifyTag(tag);
+      const bucket = bySlug.get(slug) ?? { label: tag, posts: [], notes: [] };
+      bucket.posts.push(post);
+      bySlug.set(slug, bucket);
+    }
+  }
+
+  for (const note of notes) {
+    for (const tag of note.data.tags) {
+      const slug = slugifyTag(tag);
+      const bucket = bySlug.get(slug) ?? { label: tag, posts: [], notes: [] };
+      bucket.notes.push(note);
+      bySlug.set(slug, bucket);
+    }
+  }
+
+  return [...bySlug.entries()].map(([slug, bucket]) => ({
+    params: { tag: slug },
+    props: { ...bucket },
+  }));
+}
+
+const { label, posts, notes } = Astro.props;
+---
+
+<Base title={`Tagged: ${label}`} description={`Everything tagged ${label}.`}>
+  <header class="page-head">
+    <h1>#{label}</h1>
+    <p>{posts.length + notes.length} entries.</p>
+    <div class="meta"><a href="/tags/">all tags →</a></div>
+  </header>
+
+  {
+    notes.length > 0 && (
+      <section class="section">
+        <div class="section-head">
+          <span>~/notes</span>
+        </div>
+        <ul class="entry-list">
+          {[...notes].sort(byOrder).map((note) => (
+            <Entry
+              href={`/notes/${note.id}/`}
+              label={note.data.tags.slice(0, 2).join(', ')}
+              title={note.data.title}
+              summary={note.data.summary}
+            />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    posts.length > 0 && (
+      <section class="section">
+        <div class="section-head">
+          <span>~/writing</span>
+        </div>
+        <ul class="entry-list">
+          {[...posts].sort(byDateDesc).map((post) => (
+            <Entry
+              href={`/writing/${post.id}/`}
+              label={formatDate(post.data.date)}
+              datetime={post.data.date.toISOString()}
+              title={post.data.title}
+              summary={post.data.summary}
+            />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Base>

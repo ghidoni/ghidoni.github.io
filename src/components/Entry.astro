@@ -1,0 +1,18 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  summary?: string;
+  /** Left-hand column: a date, or a category label. */
+  label?: string;
+  datetime?: string;
+}
+
+const { href, title, summary, label, datetime } = Astro.props;
+---
+
+<li class="entry">
+  {label && (datetime ? <time datetime={datetime}>{label}</time> : <span class="kind">{label}</span>)}
+  <a href={href}>{title}</a>
+  {summary && <p class="summary">{summary}</p>}
+</li>
