@@ -25,6 +25,9 @@ jobs:
       # then uploads `dist/` as the Pages artifact.
       - name: Build with Astro
         uses: withastro/action@v6
+        env:
+          # Blocks the deploy if a paper analysis still has the "My take" placeholder.
+          STRICT_TAKES: '1'
         with:
           node-version: 24
 

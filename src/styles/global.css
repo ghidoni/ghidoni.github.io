@@ -832,6 +832,15 @@ html[data-theme='light'] .theme-toggle .icon-moon {
   font-style: italic;
 }
 
+/* The final "My take" section on paper pages is the author's verdict, not the
+   generated analysis — mark the boundary visually. */
+.prose-paper h2:last-of-type {
+  margin-top: 3.2em;
+  padding-top: 1.8rem;
+  border-top: 1px dashed var(--rule);
+  color: var(--accent);
+}
+
 /* ------------------------------------------------------------------
    Tron-ish accents (dark theme only)
    ------------------------------------------------------------------ */

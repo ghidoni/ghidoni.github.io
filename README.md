@@ -98,6 +98,44 @@ draft: false
 
 `draft: true` keeps an entry out of every page, feed and the search index.
 
+### Generating a paper analysis with an agent
+
+The repo ships a skill and a command for this. From OpenCode, pass a URL, an arXiv id, or a local
+PDF:
+
+```
+/paper https://arxiv.org/abs/2104.09864
+/paper ~/Downloads/some-paper.pdf
+```
+
+The `paper-analysis` skill (`.opencode/skills/paper-analysis/`) fetches the source, extracts
+metadata and evidence, and writes exactly one file under `src/content/papers/`. It follows the
+fixed section order used by the existing pages, reuses your tags, and stops before the last
+section.
+
+**The last section is yours.** Generated pages end with:
+
+```md
+## My take
+
+<!-- take:pending -->
+
+> _Not written yet. Replace this block with your own opinion…_
+```
+
+Two guardrails make this hard to get wrong:
+
+- `npm run build` warns if a non-draft paper still contains `take:pending`.
+- The GitHub Actions build sets `STRICT_TAKES=1`, so the same check **fails the deploy** instead of
+  warning. A generated analysis cannot go live without your take.
+
+Write the opinion, delete the marker (and the blockquote), then commit. If you ever want to publish
+an analysis without an opinion, delete the whole `## My take` section — the check only looks for the
+marker.
+
+You can also skip the command and ask for the skill directly (`@paper-analysis`) or write the page
+by hand; nothing about the site depends on the agent.
+
 ### Which section does a page belong in?
 
 - Did **you** build or decide something? → `writing`.
@@ -185,6 +223,11 @@ src/
     404.astro
   styles/global.css      design tokens + all styling
 public/                   favicon, robots.txt, CNAME
+scripts/
+  check-papers.mjs       blocks deploys with an unwritten "My take"
+.opencode/
+  skills/paper-analysis/ agent workflow for generating /papers entries
+  commands/paper.md      /paper <url-or-pdf>
 ```
 
 ## Included

@@ -98,3 +98,20 @@ code that assumes the other produces a model that runs, trains, and quietly unde
 - [Prefill](/notes/prefill/) — where the position-dependent KV cache actually gets built.
 - [Sequence packing](/notes/sequence-packing/) — position ids must be handled per document when
   several sequences share a block.
+
+## My take
+
+What convinced me is not the benchmark table but the shape of the argument: if position is a
+relative quantity, encoding it as an absolute vector forces the network to learn subtraction. RoPE
+removes that burden, and doing it with no extra parameters makes the improvement almost free. That
+combination is rare.
+
+What I do not trust is the leap from "relative by construction" to "handles long context". The decay
+property is a statement about the dot product, not about what the model learned to attend to. For
+transaction sequences, where the useful horizon is set by customer behaviour rather than by token
+distance, I would expect the effective context to be shorter than the nominal one — and I would want
+to measure it rather than assume it.
+
+Practically: copy the convention, not the paper. Whichever rotation layout the base checkpoint was
+trained with is the one to use, and that is an empirical detail the paper does not settle for me.
+
