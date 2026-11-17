@@ -36,11 +36,15 @@ be something a sceptical reviewer would accept.
    the page.
 4. **One file per run.** Do not edit notes, tags, navigation, config, or other papers unless the
    user explicitly asks.
-5. **No Related section.** Keep the page about this paper. Link a concept inline only when the
+5. **Always carry the source URL when one exists.** If the input is a URL or arXiv id, set `link` to
+   the canonical landing page (the `abs` page, not the PDF). If a PDF is passed and its arXiv id or
+   DOI is legible on the first page, use that. If no canonical page can be confirmed, omit `link`
+   and say so in your report — do not invent one.
+6. **No Related section.** Keep the page about this paper. Link a concept inline only when the
    sentence needs it; never add a link list at the end.
-6. If the source is paywalled, unreadable, or extraction fails, stop and say so. Do not summarise
+7. If the source is paywalled, unreadable, or extraction fails, stop and say so. Do not summarise
    from the abstract alone and present it as a full analysis.
-7. **Do not reproduce the paper.** Quote at most one sentence, and only when the exact wording
+8. **Do not reproduce the paper.** Quote at most one sentence, and only when the exact wording
    matters. This keeps the repo free of copyrighted text.
 
 ## 1. Get the source
@@ -150,6 +154,7 @@ ls dist/papers/<slug>/index.html
 Tell the user, briefly:
 
 - the file you created and the URL it will live at (`/papers/<slug>/`);
+- the source link you recorded, so the user can confirm it points at the right paper;
 - which metadata was confirmed and which was omitted or marked "not reported";
 - the one or two claims you were least able to verify from the source;
 - that the "My take" section is theirs to write, and that `take:pending` must be removed before the

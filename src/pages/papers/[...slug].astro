@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
-import { citationLine, formatDate, slugifyTag } from '../../lib/utils';
+import { citationLine, formatDate, prettyUrl, slugifyTag } from '../../lib/utils';
 
 export async function getStaticPaths() {
   const papers = await getCollection('papers', ({ data }) => !data.draft);
@@ -23,19 +23,17 @@ const citation = citationLine(paper.data);
         <span>analysis {formatDate(paper.data.date)}</span>
       </div>
       <h1>{paper.data.title}</h1>
-      <p class="citation">
-        {citation}
-        {
-          paper.data.link && (
-            <>
-              {' · '}
-              <a href={paper.data.link} rel="noopener noreferrer">
-                source ↗
-              </a>
-            </>
-          )
-        }
-      </p>
+      <p class="citation">{citation}</p>
+      {
+        paper.data.link && (
+          <p class="source-link" data-pagefind-ignore>
+            <span class="label">source</span>
+            <a href={paper.data.link} rel="noopener noreferrer" title={paper.data.link}>
+              {prettyUrl(paper.data.link)} ↗
+            </a>
+          </p>
+        )
+      }
       <p class="summary">{paper.data.summary}</p>
       {
         paper.data.tags.length > 0 && (

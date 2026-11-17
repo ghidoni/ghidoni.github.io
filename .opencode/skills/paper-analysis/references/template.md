@@ -3,7 +3,7 @@ title: '<source title, verbatim>'
 authors: ['First Last', 'First Last']
 year: 2025
 venue: 'NeurIPS'
-link: 'https://example.com/paper'
+link: 'https://example.com/paper' # canonical page — rendered as a clickable "source" row
 kind: paper
 date: 2026-11-17
 summary: '<the technical takeaway in one sentence, under 30 words>'

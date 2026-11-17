@@ -86,7 +86,7 @@ title: 'RoFormer: Enhanced Transformer with Rotary Position Embedding'
 authors: ['Jianlin Su', 'Yu Lu', 'Shengfeng Pan']
 year: 2021
 venue: 'arXiv'
-link: 'https://arxiv.org/abs/2104.09864'
+link: 'https://arxiv.org/abs/2104.09864' # rendered as a clickable source row
 kind: preprint # paper | preprint | article | book | talk
 date: 2026-11-17 # when you wrote the analysis
 summary: 'The one-line takeaway shown in lists, RSS and search.'

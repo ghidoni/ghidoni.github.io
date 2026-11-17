@@ -50,3 +50,11 @@ export function citationLine(data: {
     .filter(Boolean)
     .join(' · ');
 }
+
+/** "https://www.arxiv.org/abs/2104.09864/" → "arxiv.org/abs/2104.09864" for display. */
+export function prettyUrl(url: string): string {
+  return url
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .replace(/\/$/, '');
+}
