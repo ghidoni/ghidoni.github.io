@@ -1,6 +1,6 @@
 ---
 name: Paper Analysis
-description: Turn a paper or article (URL, arXiv id, or local PDF) into a cited /papers entry for this site — summary, analysis, and a reserved "My take" section left for the author to write.
+description: Turn a paper or article (URL, arXiv id, or local PDF) into a cited /papers entry for this site — a technical analysis with a reserved "My take" section left for the author to write.
 ---
 
 # Paper analysis
@@ -10,21 +10,38 @@ Use this when the user supplies a link, arXiv id, or PDF and wants a page under 
 You produce **one new markdown file** and nothing else. The site derives the page, index row, tag
 pages, RSS item and search record from that file.
 
+## Audience and bar
+
+The author is a staff-level data scientist. Write for someone who already knows transformers,
+backpropagation, and distributed training. Do not explain fundamentals, do not define
+cross-entropy, and do not pad with background the reader already has.
+
+The value you add is precision:
+
+- what exactly was done (architecture, objective, data, compute);
+- what exactly was measured (datasets, baselines, ablations, variance);
+- what does **not** follow from it.
+
+Every quantitative sentence must be checkable against the source. Every qualitative sentence should
+be something a sceptical reviewer would accept.
+
 ## Hard rules
 
-1. **Never invent metadata.** Title, authors, year, venue and link must come from the source. All
-   fields except `title`, `date` and `summary` are optional — omit what you cannot confirm.
+1. **Never invent metadata or numbers.** Title, authors, year, venue and link come from the source.
+   Quote a result only if it appears in the paper. If a field cannot be confirmed, omit it.
 2. **Never write the "My take" section.** That section belongs to the site's author. Create the
    heading and the placeholder marker exactly as templated, then stop.
-3. **Never fabricate results.** Quote a number only if it appears in the source. When repeating a
-   claim you did not verify, attribute it: "the paper reports…".
+3. **Say what is missing.** If the paper does not report compute, seeds, data filtering, or an
+   ablation, write "not reported" and treat that as a finding — it is often the most useful line on
+   the page.
 4. **One file per run.** Do not edit notes, tags, navigation, config, or other papers unless the
    user explicitly asks.
-5. If the source is paywalled, unreadable, or extraction fails, stop and say so. Do not summarise
+5. **No Related section.** Keep the page about this paper. Link a concept inline only when the
+   sentence needs it; never add a link list at the end.
+6. If the source is paywalled, unreadable, or extraction fails, stop and say so. Do not summarise
    from the abstract alone and present it as a full analysis.
-6. **Do not reproduce the paper.** Quote at most a single sentence, and only when the exact wording
-   matters. The page is your analysis, not an excerpt — this also keeps the repo free of
-   copyrighted text.
+7. **Do not reproduce the paper.** Quote at most one sentence, and only when the exact wording
+   matters. This keeps the repo free of copyrighted text.
 
 ## 1. Get the source
 
@@ -35,46 +52,63 @@ pages, RSS item and search record from that file.
 | Other URL | Fetch the page. If it is a PDF, download it first with `curl -L -o` |
 | Title only | Search for it and confirm the match with the user **before** writing |
 
-Download PDFs to `/tmp/opencode/papers/` (create the directory). Read the first 12–15 pages:
-abstract, introduction, method, results, limitations. Skip related work and the appendix unless a
-claim depends on them. For long papers, read in chunks rather than all at once.
+Download PDFs to `/tmp/opencode/papers/` (create the directory). Read the first 12–15 pages, then
+jump to the results tables, ablations, and limitations. Skip related work. For long papers read in
+chunks rather than all at once.
 
-## 2. Extract before writing
+## 2. Extraction protocol
 
-Write down, separately:
+Work through this checklist before writing a single sentence. Take notes on each item; you will not
+put all of it in the page.
 
-- **What they claim** — the contribution, in one sentence.
-- **What they show** — datasets, baselines, the specific numbers, and what those numbers can and
-  cannot support.
-- **What they assume** — the conditions under which the result holds.
-- **What they admit** — limitations the authors state themselves.
+**Setup**
+- Data: source, size, domain, filtering, deduplication, tokenizer, sequence length.
+- Model: parameter count, depth/width, attention variant, context length.
+- Training: objective, optimizer, LR schedule, batch size, precision, hardware, compute budget.
+- Missing anything? Write "not reported" and note it.
 
-Keep claim and evidence distinct. Most bad analyses collapse the two.
+**Method**
+- The actual change relative to the baseline, and where it enters the computation.
+- Equations with symbols defined once. One display equation is usually enough.
+- Cost of the change: parameters, FLOPs, memory, latency.
+
+**Evidence**
+- Datasets, splits, and whether baselines were compute-matched and tuned.
+- Ablations: which component carries the gain, and how much.
+- Variance: seeds, error bars, significance. A single-run win is weak evidence.
+- Validity: contamination, test-set tuning, metric selection, cherry-picked settings.
+- Numbers with units, and the effect size that would matter in practice.
+
+**Limits**
+- Regimes not tested, scale not reached, assumptions required for the result to hold.
+- Reproduction artifacts: code, data, hyperparameters.
+- Gap between what the abstract claims and what the experiments support.
 
 ## 3. Write the page
 
 Copy `references/template.md` from this skill and fill it in. The section order is fixed:
 
-1. **Opening paragraph** (no heading) — the claim, 2–4 sentences, no preamble.
-2. **How it works** — the mechanism. Use display math where it earns its place; avoid long inline
-   formulas (they wrap badly on mobile).
-3. **Evidence** — what was measured and what it supports. Attribute numbers.
-4. **What to be careful about** — limits, assumptions, failure modes, anything the abstract
-   oversells.
-5. **Why it matters for my work** — optional. Keep only if there is a real connection to
-   transaction foundation models; delete the section rather than pad it.
-6. **Related** — links to existing `/notes/…` or `/papers/…` pages. Verify each path exists.
-7. **My take** — heading plus the `<!-- take:pending -->` marker and placeholder blockquote,
-   always last.
+1. **Opening paragraph** (no heading) — the claim and why it is non-obvious, 2–4 sentences.
+2. **Method** — mechanism, equations, and cost. Assume fluency; skip the tutorial.
+3. **Evidence** — experimental design and results. Attribute numbers; separate result from
+   interpretation.
+4. **Limits and failure modes** — assumptions, untested regimes, reproduction gaps, anything the
+   abstract oversells.
+5. **What this changes** — consequences if the paper is right, for foundation models and deep
+   learning generally: training, serving, evaluation, tooling. Not tied to any one project. At most
+   three points; if the paper is narrow enough that nothing generalises, say so and keep it short
+   rather than manufacturing relevance.
+6. **My take** — heading plus the `<!-- take:pending -->` marker and placeholder blockquote, always
+   last.
 
-Target 500–900 words. Match the voice of `src/content/papers/roformer-rotary-position-embedding.md`:
-first person, terse, willing to disagree with the paper. No marketing adjectives ("powerful",
-"revolutionary", "groundbreaking") and no filler openings ("In this paper, the authors…").
+Target 700–1200 words. Numbers over narrative; conditions over adjectives. Avoid marketing language
+("powerful", "revolutionary", "groundbreaking") and filler openings ("In this paper, the authors…").
+Match the voice of `src/content/papers/roformer-rotary-position-embedding.md`.
 
 ## 4. Name the file
 
-`src/content/papers/<slug>.md`, where the slug is lowercase, hyphenated, 4–8 words, and drops the
-subtitle after a colon unless the subtitle is the recognisable name:
+`src/content/papers/<slug>.md`, lowercase, hyphenated, 4–8 words, dropping the subtitle after a
+colon unless it is the recognisable name:
 
 - "RoFormer: Enhanced Transformer with Rotary Position Embedding" →
   `roformer-rotary-position-embedding`
@@ -85,7 +119,7 @@ Check `ls src/content/papers/` first and never reuse a slug.
 
 ## 5. Choose tags
 
-Prefer tags already in use. Collect them with:
+Prefer tags already in use:
 
 ```sh
 grep -h '^tags:' src/content/papers/*.md src/content/notes/*.md
@@ -102,10 +136,10 @@ npm run build
 ```
 
 `npm run build` prints a warning when a non-draft paper still contains `take:pending`. That warning
-is **expected** for a freshly generated page — it means the guard is doing its job. In CI the same
-check fails the deploy, so a page cannot go live without the author's take.
+is **expected** for a freshly generated page — the CI build sets `STRICT_TAKES=1` and fails the
+deploy instead, so a page cannot go live without the author's take.
 
-Then confirm the route exists:
+Confirm the route exists:
 
 ```sh
 ls dist/papers/<slug>/index.html
@@ -115,8 +149,8 @@ ls dist/papers/<slug>/index.html
 
 Tell the user, briefly:
 
-- the file you created;
-- the URL it will live at (`/papers/<slug>/`);
-- which metadata was confirmed from the source and which was omitted or inferred;
-- that the "My take" section is theirs to write, and that `take:pending` must be removed before
-  the page can deploy.
+- the file you created and the URL it will live at (`/papers/<slug>/`);
+- which metadata was confirmed and which was omitted or marked "not reported";
+- the one or two claims you were least able to verify from the source;
+- that the "My take" section is theirs to write, and that `take:pending` must be removed before the
+  page can deploy.

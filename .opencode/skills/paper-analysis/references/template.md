@@ -6,39 +6,42 @@ venue: 'NeurIPS'
 link: 'https://example.com/paper'
 kind: paper
 date: 2026-11-17
-summary: '<the takeaway in one sentence, under 30 words>'
+summary: '<the technical takeaway in one sentence, under 30 words>'
 status: read
 tags: ['tag-a', 'tag-b']
 draft: false
 ---
 
-<The claim, 2–4 sentences, no preamble. What does this paper assert, and why does it matter?>
+<The claim and why it is non-obvious. 2–4 sentences, no preamble, no background.>
 
-## How it works
+## Method
 
-<The mechanism. One display equation is usually enough:
+<What was actually changed, where it enters the computation, and what it costs. Define symbols
+once. One display equation is usually enough:
 
 $$
 \mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^{N}\log p_\theta(x_i \mid x_{<i})
 $$
 
+State the setup that matters for interpreting the results: data, model size, compute — or write
+"not reported".
+
 ## Evidence
 
-<What they measured, on what data, against which baselines. Attribute the numbers: "the paper
-reports…". Say what the numbers support and what they do not.>
+<Datasets, baselines (compute-matched? tuned?), ablations, and the numbers that matter. Attribute
+results: "the paper reports…". Separate what was measured from what it is claimed to mean. Flag
+missing seeds, error bars, or significance tests.>
 
-## What to be careful about
+## Limits and failure modes
 
-<Limits, assumptions, failure modes, and anything the abstract oversells.>
+<Assumptions the result depends on, regimes not tested, reproduction gaps (code, data,
+hyperparameters), and anything the abstract oversells. "Not reported" is a valid and useful entry.>
 
-## Why it matters for my work
+## What this changes
 
-<Optional. Delete this whole section if there is no real connection to the transaction foundation
-model.>
-
-## Related
-
-- [Concept](/notes/slug/) — one line on why it is related.
+<If the paper is right, what shifts for foundation models or deep learning generally — training,
+serving, evaluation, tooling. At most three points. No tie-in to a specific project; if nothing
+generalises, say so in a sentence and stop.>
 
 ## My take
 
