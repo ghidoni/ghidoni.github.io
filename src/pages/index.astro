@@ -3,11 +3,15 @@ import Base from '../layouts/Base.astro';
 import Entry from '../components/Entry.astro';
 import { getCollection } from 'astro:content';
 import { SITE } from '../consts';
-import { byDateDesc, byOrder, formatDate } from '../lib/utils';
+import { byDateDesc, byOrder, citationLine, formatDate } from '../lib/utils';
 
 const posts = (await getCollection('writing', ({ data }) => !data.draft))
   .sort(byDateDesc)
   .slice(0, 5);
+
+const papers = (await getCollection('papers', ({ data }) => !data.draft))
+  .sort(byDateDesc)
+  .slice(0, 3);
 
 const notes = (await getCollection('notes', ({ data }) => !data.draft))
   .sort(byOrder)
@@ -50,8 +54,33 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft))
 
   <section class="section">
     <div class="section-head">
+      <span>~/papers</span>
+      <a href="/papers/">all →</a>
+    </div>
+    {
+      papers.length ? (
+        <ul class="entry-list">
+          {papers.map((paper) => (
+            <Entry
+              href={`/papers/${paper.id}/`}
+              label={formatDate(paper.data.date)}
+              datetime={paper.data.date.toISOString()}
+              title={paper.data.title}
+              meta={citationLine(paper.data)}
+              summary={paper.data.summary}
+            />
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">No analyses yet.</p>
+      )
+    }
+  </section>
+
+  <section class="section">
+    <div class="section-head">
       <span>~/notes</span>
-      <a href="/notes/">library →</a>
+      <a href="/notes/">all →</a>
     </div>
     {
       notes.length ? (

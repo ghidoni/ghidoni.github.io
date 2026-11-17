@@ -6,13 +6,16 @@ interface Props {
   /** Left-hand column: a date, or a category label. */
   label?: string;
   datetime?: string;
+  /** Optional second line under the title, e.g. a citation. */
+  meta?: string;
 }
 
-const { href, title, summary, label, datetime } = Astro.props;
+const { href, title, summary, label, datetime, meta } = Astro.props;
 ---
 
 <li class="entry">
   {label && (datetime ? <time datetime={datetime}>{label}</time> : <span class="kind">{label}</span>)}
   <a href={href}>{title}</a>
+  {meta && <p class="entry-meta">{meta}</p>}
   {summary && <p class="summary">{summary}</p>}
 </li>

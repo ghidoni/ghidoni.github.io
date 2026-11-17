@@ -1,0 +1,57 @@
+---
+import Base from '../../layouts/Base.astro';
+import Entry from '../../components/Entry.astro';
+import { getCollection } from 'astro:content';
+import { byDateDesc, citationLine, formatDate } from '../../lib/utils';
+
+const papers = (await getCollection('papers', ({ data }) => !data.draft)).sort(byDateDesc);
+
+// Group by the year the analysis was written.
+const years = new Map<number, typeof papers>();
+for (const paper of papers) {
+  const year = paper.data.date.getUTCFullYear();
+  years.set(year, [...(years.get(year) ?? []), paper]);
+}
+---
+
+<Base
+  title="Papers"
+  description="Close readings of papers and articles, with the source cited and a dated takeaway."
+>
+  <header class="page-head">
+    <h1>Papers</h1>
+    <p>
+      Close readings of papers and articles I'm working through. Each page cites the source, states
+      the takeaway up front, then argues with it. For my own project logs, see
+      <a href="/writing/">writing</a>; for definitions, see <a href="/notes/">notes</a>.
+    </p>
+    <div class="meta">
+      <span>{papers.length} {papers.length === 1 ? 'analysis' : 'analyses'}</span>
+      <a href="/rss.xml">rss</a>
+    </div>
+  </header>
+
+  {
+    [...years.entries()].map(([year, group]) => (
+      <section class="section">
+        <div class="section-head">
+          <span>{year}</span>
+        </div>
+        <ul class="entry-list">
+          {group.map((paper) => (
+            <Entry
+              href={`/papers/${paper.id}/`}
+              label={formatDate(paper.data.date)}
+              datetime={paper.data.date.toISOString()}
+              title={paper.data.title}
+              meta={`${citationLine(paper.data)} · ${paper.data.status}`}
+              summary={paper.data.summary}
+            />
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+
+  {papers.length === 0 && <p class="empty">No analyses yet.</p>}
+</Base>

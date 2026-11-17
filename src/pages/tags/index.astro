@@ -3,12 +3,13 @@ import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { slugifyTag, tagCounts } from '../../lib/utils';
 
-const [posts, notes] = await Promise.all([
+const [posts, notes, papers] = await Promise.all([
   getCollection('writing', ({ data }) => !data.draft),
   getCollection('notes', ({ data }) => !data.draft),
+  getCollection('papers', ({ data }) => !data.draft),
 ]);
 
-const counts = tagCounts([...posts, ...notes]);
+const counts = tagCounts([...posts, ...notes, ...papers]);
 ---
 
 <Base title="Tags" description="All tags used across writing and notes.">

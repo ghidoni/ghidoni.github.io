@@ -31,4 +31,29 @@ const notes = defineCollection({
   }),
 });
 
-export const collections = { writing, notes };
+/**
+ * Close readings of papers and articles. The subject is external, so the
+ * frontmatter carries citation data rather than just a title.
+ */
+const papers = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/papers' }),
+  schema: z.object({
+    /** The source's title, not your own headline. */
+    title: z.string(),
+    authors: z.array(z.string()).default([]),
+    year: z.number().int().optional(),
+    venue: z.string().optional(),
+    /** Canonical link to the paper or article. */
+    link: z.url().optional(),
+    kind: z.enum(['paper', 'preprint', 'article', 'book', 'talk']).default('paper'),
+    /** When the analysis was written. */
+    date: z.coerce.date(),
+    /** The one-line takeaway. */
+    summary: z.string(),
+    status: z.enum(['skimmed', 'read', 'studied']).default('read'),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { writing, notes, papers };

@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { citationLine, formatDate, slugifyTag } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const papers = await getCollection('papers', ({ data }) => !data.draft);
+  return papers.map((paper) => ({ params: { slug: paper.id }, props: { paper } }));
+}
+
+const { paper } = Astro.props;
+const { Content } = await render(paper);
+const citation = citationLine(paper.data);
+---
+
+<Base title={paper.data.title} description={paper.data.summary} type="article">
+  <article data-pagefind-body data-pagefind-filter="section:Papers">
+    <header class="post-head">
+      <div class="meta" data-pagefind-ignore>
+        <a href="/papers/">~/papers</a>
+        <span>{paper.data.kind}</span>
+        <span>{paper.data.status}</span>
+        <span>analysis {formatDate(paper.data.date)}</span>
+      </div>
+      <h1>{paper.data.title}</h1>
+      <p class="citation">
+        {citation}
+        {
+          paper.data.link && (
+            <>
+              {' · '}
+              <a href={paper.data.link} rel="noopener noreferrer">
+                source ↗
+              </a>
+            </>
+          )
+        }
+      </p>
+      <p class="summary">{paper.data.summary}</p>
+      {
+        paper.data.tags.length > 0 && (
+          <div class="tags">
+            {paper.data.tags.map((tag) => (
+              <a class="tag" href={`/tags/${slugifyTag(tag)}/`}>
+                {tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .post-head .meta a {
+    color: var(--text-low);
+    text-decoration: none;
+  }
+  .post-head .meta a:hover {
+    color: var(--accent);
+  }
+</style>

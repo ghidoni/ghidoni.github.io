@@ -2,31 +2,41 @@
 import Base from '../../layouts/Base.astro';
 import Entry from '../../components/Entry.astro';
 import { getCollection } from 'astro:content';
-import { byDateDesc, byOrder, formatDate, slugifyTag } from '../../lib/utils';
+import { byDateDesc, byOrder, citationLine, formatDate, slugifyTag } from '../../lib/utils';
 
 export async function getStaticPaths() {
-  const [posts, notes] = await Promise.all([
+  const [posts, notes, papers] = await Promise.all([
     getCollection('writing', ({ data }) => !data.draft),
     getCollection('notes', ({ data }) => !data.draft),
+    getCollection('papers', ({ data }) => !data.draft),
   ]);
 
-  const bySlug = new Map<string, { label: string; posts: typeof posts; notes: typeof notes }>();
+  const bySlug = new Map<
+    string,
+    { label: string; posts: typeof posts; notes: typeof notes; papers: typeof papers }
+  >();
+
+  const buckets = (slug: string, tag: string) => {
+    const bucket = bySlug.get(slug) ?? { label: tag, posts: [], notes: [], papers: [] };
+    bySlug.set(slug, bucket);
+    return bucket;
+  };
 
   for (const post of posts) {
     for (const tag of post.data.tags) {
-      const slug = slugifyTag(tag);
-      const bucket = bySlug.get(slug) ?? { label: tag, posts: [], notes: [] };
-      bucket.posts.push(post);
-      bySlug.set(slug, bucket);
+      buckets(slugifyTag(tag), tag).posts.push(post);
     }
   }
 
   for (const note of notes) {
     for (const tag of note.data.tags) {
-      const slug = slugifyTag(tag);
-      const bucket = bySlug.get(slug) ?? { label: tag, posts: [], notes: [] };
-      bucket.notes.push(note);
-      bySlug.set(slug, bucket);
+      buckets(slugifyTag(tag), tag).notes.push(note);
+    }
+  }
+
+  for (const paper of papers) {
+    for (const tag of paper.data.tags) {
+      buckets(slugifyTag(tag), tag).papers.push(paper);
     }
   }
 
@@ -36,35 +46,16 @@ export async function getStaticPaths() {
   }));
 }
 
-const { label, posts, notes } = Astro.props;
+const { label, posts, notes, papers } = Astro.props;
+const total = posts.length + notes.length + papers.length;
 ---
 
 <Base title={`Tagged: ${label}`} description={`Everything tagged ${label}.`}>
   <header class="page-head">
     <h1>#{label}</h1>
-    <p>{posts.length + notes.length} entries.</p>
+    <p>{total} entries.</p>
     <div class="meta"><a href="/tags/">all tags →</a></div>
   </header>
-
-  {
-    notes.length > 0 && (
-      <section class="section">
-        <div class="section-head">
-          <span>~/notes</span>
-        </div>
-        <ul class="entry-list">
-          {[...notes].sort(byOrder).map((note) => (
-            <Entry
-              href={`/notes/${note.id}/`}
-              label={note.data.tags.slice(0, 2).join(', ')}
-              title={note.data.title}
-              summary={note.data.summary}
-            />
-          ))}
-        </ul>
-      </section>
-    )
-  }
 
   {
     posts.length > 0 && (
@@ -80,6 +71,48 @@ const { label, posts, notes } = Astro.props;
               datetime={post.data.date.toISOString()}
               title={post.data.title}
               summary={post.data.summary}
+            />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    papers.length > 0 && (
+      <section class="section">
+        <div class="section-head">
+          <span>~/papers</span>
+        </div>
+        <ul class="entry-list">
+          {[...papers].sort(byDateDesc).map((paper) => (
+            <Entry
+              href={`/papers/${paper.id}/`}
+              label={formatDate(paper.data.date)}
+              datetime={paper.data.date.toISOString()}
+              title={paper.data.title}
+              meta={citationLine(paper.data)}
+              summary={paper.data.summary}
+            />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    notes.length > 0 && (
+      <section class="section">
+        <div class="section-head">
+          <span>~/notes</span>
+        </div>
+        <ul class="entry-list">
+          {[...notes].sort(byOrder).map((note) => (
+            <Entry
+              href={`/notes/${note.id}/`}
+              label={note.data.tags.slice(0, 2).join(', ')}
+              title={note.data.title}
+              summary={note.data.summary}
             />
           ))}
         </ul>

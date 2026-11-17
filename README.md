@@ -1,9 +1,11 @@
 # Personal site
 
-A static personal site built with [Astro](https://astro.build), designed to hold two kinds of
+A static personal site built with [Astro](https://astro.build), designed to hold three kinds of
 content:
 
 - **`/writing`** — dated, chronological devlogs and essays. Never rewritten after publication.
+- **`/papers`** — close readings of papers and articles. Each entry carries citation metadata and a
+  one-line takeaway, so the section doubles as an annotated bibliography.
 - **`/notes`** — an evergreen library. One page per concept (pre-training, fine-tuning, prefill,
   sequence packing, …), revised over time, each showing a "last reviewed" date.
 
@@ -43,8 +45,9 @@ Search only exists after a build, so use `npm run build && npm run preview` to t
 
 ## Writing content
 
-Posts live in `src/content/writing/`, notes in `src/content/notes/`. The filename becomes the URL:
-`src/content/notes/prefill.md` → `/notes/prefill/`.
+Posts live in `src/content/writing/`, paper analyses in `src/content/papers/`, notes in
+`src/content/notes/`. The filename becomes the URL: `src/content/notes/prefill.md` →
+`/notes/prefill/`.
 
 **Treat note slugs as permanent.** You will link to them from papers, CVs and conversations. If a
 page needs a new name, add a redirect rather than renaming the file.
@@ -75,7 +78,34 @@ draft: false
 ---
 ```
 
+Papers frontmatter (the `title` is the *source's* title, not your headline):
+
+```yaml
+---
+title: 'RoFormer: Enhanced Transformer with Rotary Position Embedding'
+authors: ['Jianlin Su', 'Yu Lu', 'Shengfeng Pan']
+year: 2021
+venue: 'arXiv'
+link: 'https://arxiv.org/abs/2104.09864'
+kind: preprint # paper | preprint | article | book | talk
+date: 2026-11-17 # when you wrote the analysis
+summary: 'The one-line takeaway shown in lists, RSS and search.'
+status: studied # skimmed | read | studied
+tags: ['architecture', 'position-encoding']
+draft: false
+---
+```
+
 `draft: true` keeps an entry out of every page, feed and the search index.
+
+### Which section does a page belong in?
+
+- Did **you** build or decide something? → `writing`.
+- Is the subject **someone else's** paper or article? → `papers`.
+- Is it a **definition** you will revise forever, with no external subject? → `notes`.
+
+A paper analysis and a concept note often pair up. Write the analysis in `papers`, and if the
+concept deserves a permanent definition, write that in `notes` and link the two.
 
 ### Markdown extras
 
@@ -91,7 +121,8 @@ $EDITOR src/content/notes/prefill.md
 npm run dev            # check it at /notes/prefill/
 ```
 
-It automatically appears in `/notes`, in its tag pages, in search, and in the sitemap.
+It automatically appears in `/notes`, in its tag pages, in search, and in the sitemap. The same is
+true for anything you add under `src/content/papers/` or `src/content/writing/`.
 
 ## Deploy to GitHub Pages
 
@@ -138,6 +169,7 @@ src/
   content.config.ts      schemas for the two collections
   content/
     writing/*.md         dated posts
+    papers/*.md          cited paper analyses
     notes/*.md           evergreen reference pages
   layouts/Base.astro     <head>, header, footer, theme bootstrap
   components/            Header, Footer, Entry
@@ -145,6 +177,7 @@ src/
   pages/
     index.astro          homepage
     writing/             index + [slug]
+    papers/              index + [slug]
     notes/                index + [slug]
     tags/                 index + [tag]
     search.astro         Pagefind UI
@@ -157,7 +190,7 @@ public/                   favicon, robots.txt, CNAME
 ## Included
 
 - Dark/light theme with no flash on load, remembered in `localStorage`
-- Per-year writing archive, tag pages, RSS, sitemap
+- Per-year archives for writing and papers, tag pages, RSS, sitemap
 - KaTeX, Shiki, Pagefind search with section filters
 - SEO tags, canonical URLs, reduced-motion support, skip link
 
@@ -171,5 +204,6 @@ Analytics, comments, and a CMS. Add them only when you miss them:
 
 ## Sample content to delete
 
-`src/content/writing/starting-the-tfm-log.md` and the four files in `src/content/notes/` are seeds
-written to demonstrate the format. Replace them with your own.
+`src/content/writing/starting-the-tfm-log.md`, `src/content/papers/roformer-rotary-position-embedding.md`
+and the four files in `src/content/notes/` are seeds written to demonstrate the format. Replace them
+with your own.

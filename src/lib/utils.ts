@@ -31,3 +31,22 @@ export function slugifyTag(tag: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
+
+/** "Vaswani et al." / "A & B" / "Solo". */
+export function shortAuthors(authors: string[]): string {
+  if (authors.length === 0) return '';
+  if (authors.length === 1) return authors[0];
+  if (authors.length === 2) return `${authors[0]} & ${authors[1]}`;
+  return `${authors[0]} et al.`;
+}
+
+/** One-line citation: authors · venue · year. */
+export function citationLine(data: {
+  authors: string[];
+  venue?: string;
+  year?: number;
+}): string {
+  return [shortAuthors(data.authors), data.venue, data.year?.toString()]
+    .filter(Boolean)
+    .join(' · ');
+}
