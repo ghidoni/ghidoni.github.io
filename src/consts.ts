@@ -1,19 +1,18 @@
 export const SITE = {
   /** Shown in the header, page titles and RSS. */
-  title: 'Thiago Ghidoni Mantovan',
+  title: 'Thiago Ghidoni',
   /** Used as the <meta name="description"> on the homepage. */
   description:
-    'Notes on machine learning, transaction foundation models, and the systems that make them run.',
-  author: 'Your Name',
+    'My thoughts, notes, readings, and other things I find interesting and useful about data science, machine learning, and software engineering.',
+  author: 'Thiago Ghidoni',
   /** Must match `site` in astro.config.mjs. */
   url: 'https://ghidoni.github.io',
-  email: 'you@example.com',
+  email: 'thighidoni@gmail.com',
   /** Short line under the homepage intro. */
-  now: 'Currently: building a transaction foundation model.',
+  now: 'Staff Data Scientist at Itaú Unibanco. Working on credit risk modeling.',
   socials: [
     { label: 'github', href: 'https://github.com/ghidoni' },
-    { label: 'x', href: 'https://x.com/ghidoni' },
-    { label: 'linkedin', href: 'https://www.linkedin.com/in/ghidoni/' },
+    { label: 'linkedin', href: 'https://www.linkedin.com/in/thiago-ghidoni-mantovan/' },
     { label: 'email', href: 'mailto:thighidoni@gmail.com' },
   ],
 };
