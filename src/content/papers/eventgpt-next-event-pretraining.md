@@ -132,8 +132,3 @@ are per-institution, so the reusable artifact is the recipe and evaluation proto
 checkpoint. Both are now checkable by anyone.
 
 ## My take
-
-<!-- take:pending -->
-
-> _Not written yet. Replace this block with your own opinion — what convinced you, what you doubt,
-> and whether it changes how you build._

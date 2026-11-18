@@ -142,7 +142,3 @@ the authors would rather not have printed.
 
 ## My take
 
-<!-- take:pending -->
-
-> _Not written yet. Replace this block with your own opinion — what convinced you, what you doubt,
-> and whether it changes how you build._

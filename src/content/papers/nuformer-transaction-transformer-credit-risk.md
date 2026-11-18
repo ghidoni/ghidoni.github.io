@@ -130,8 +130,3 @@ general LLM does not transfer for free to spending sequences.
 - [RoFormer](/papers/roformer-rotary-position-embedding/) — the option this paper declines by using NoPE.
 
 ## My take
-
-<!-- take:pending -->
-
-> _Not written yet. Replace this block with your own opinion — what convinced you, what you doubt,
-> and whether it changes how you build._
